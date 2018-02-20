@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/NoiseServer.iml" filepath="$PROJECT_DIR$/.idea/modules/NoiseServer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/NoiseServer_main.iml" filepath="$PROJECT_DIR$/.idea/modules/NoiseServer_main.iml" group="NoiseServer" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/NoiseServer_test.iml" filepath="$PROJECT_DIR$/.idea/modules/NoiseServer_test.iml" group="NoiseServer" />
+    </modules>
+  </component>
+</project>
