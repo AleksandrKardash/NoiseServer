@@ -62,27 +62,58 @@ class ThreadEchoHandler implements Runnable {
     public ThreadEchoHandler(Socket st) {
         client = st;
     }
+
+    private int a;
+    private Socket client;
+
+    private MyRequest request;
+    private MyRequest request2;
+    private Object obj = null;
+
     public void run() {
         try {
 
             //Создаем входной поток сервера
-            BufferedReader in  = new BufferedReader(new InputStreamReader(client.getInputStream()));
             BufferedInputStream bis = new BufferedInputStream(client.getInputStream());
             ObjectInputStream ois = new ObjectInputStream(bis);
             //Создаем выходной поток сервера
-            PrintWriter out = new PrintWriter(client.getOutputStream(),true);
+            BufferedOutputStream bos = new BufferedOutputStream(client.getOutputStream());
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
             try{
+                //читаем обьект MyRequest в цикле
+                while ((obj = ois.readObject())!=null) {
+                    request = (MyRequest) obj; // приводит сначала к типу базового реквеста
 
+                    // получаем тип обьекта, а потом в зависимости от типа запроса приводим к нужному классу
+                    switch (request.getRequestType()) {
 
-                if (true) {
-                    User obj2 = (User) ois.readObject();
-                    DataManager.getInstance().addUser(obj2);
-                    DBHandler handler = DBHandler.getInstance();
-                    int reg = handler.Create(obj2);
-                    out.println(reg);
+                        case USER:
+
+                            //читаем из реквеста обьект и приводим к нужному классу, записываем данные в БД и получаем результат записи
+                            User obj2 = (User) request.getData();
+                            DataManager.getInstance().addUser(obj2);
+                            DBHandler handler = DBHandler.getInstance();
+                            int reg = handler.Create(obj2);
+                            //записываем и передаем ответ в виде обьекта MyRequest
+                            request2 = new MyRequest(MyRequest.RequestType.INT, reg);
+                            oos.writeObject(request2);
+                            oos.flush();
+
+                            break;
+
+                        case LIST:
+
+                            ArrayList obj3 = (ArrayList) request.getData();
+                            String login = (String) obj3.get(0);
+                            String password = (String) obj3.get(1);
+                            DBHandler handler2 = DBHandler.getInstance();
+                            MyRequest request3 = handler2.Read(login, password);
+                            oos.writeObject(request3);
+                            oos.flush();
+
+                            break;
+                    }
                 }
-
-
 
             }catch(Exception e){}
 
@@ -105,5 +136,4 @@ class ThreadEchoHandler implements Runnable {
             e.printStackTrace();
         }
     }
-    private Socket client;
 }

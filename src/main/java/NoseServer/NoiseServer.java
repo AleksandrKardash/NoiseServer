@@ -6,8 +6,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import net.Communication;
-import net.MultiThreadServerB;
-import net.NetHelperB;
 
 public class NoiseServer extends Application {
 
@@ -22,8 +20,6 @@ public class NoiseServer extends Application {
           stage.setTitle("Noise Server");
           stage.setScene(new Scene(root, 300,350));
           //получение ссылки на контроллер для доступа к его методам!
-          NetHelperB.controller = fxmlLoader.getController();
-          MultiThreadServerB.controller = fxmlLoader.getController();
           Communication.controller = fxmlLoader.getController();
           stage.show();
 
