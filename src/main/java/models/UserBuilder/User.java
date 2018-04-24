@@ -11,6 +11,7 @@ public class User  implements Serializable {
     private String phone;
     private String login;
     private String password;
+    private String seller;
 
     public static boolean reg=false;
 
@@ -48,6 +49,10 @@ public class User  implements Serializable {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getSeller() {
+        return seller;
     }
 
     public static class Builder implements UserBuilder{
@@ -94,6 +99,12 @@ public class User  implements Serializable {
     @Override
     public Builder setPassword(String p) {
         user.password = p;
+        return this;
+    }
+
+    @Override
+    public Builder setSeller(String s) {
+        user.seller = s;
         return this;
     }
 

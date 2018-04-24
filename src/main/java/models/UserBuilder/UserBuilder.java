@@ -9,6 +9,7 @@ interface UserBuilder{
     public User.Builder setPhone(String p);
     public User.Builder setLogin(String l);
     public User.Builder setPassword(String p);
+    public User.Builder setSeller(String s);
 
     public User build();
 }

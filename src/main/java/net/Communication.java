@@ -2,7 +2,6 @@ package net;
 
 import BD.DBHandler;
 import UI.controller.MainController;
-import manager.DataManager;
 import models.BuilderCar.Car;
 import models.UserBuilder.User;
 
@@ -69,6 +68,7 @@ class ThreadEchoHandler implements Runnable {
     private MyRequest request;
     private MyRequest request2;
     private Object obj = null;
+    private DBHandler handler = null;
 
     public void run() {
         try {
@@ -84,32 +84,36 @@ class ThreadEchoHandler implements Runnable {
                 while ((obj = ois.readObject())!=null) {
                     request = (MyRequest) obj; // приводит сначала к типу базового реквеста
 
-                    // получаем тип обьекта, а потом в зависимости от типа запроса приводим к нужному классу
+                    // получаем тип запроса, а потом в зависимости от типа запроса отправляем в нужный метод DBHandler
                     switch (request.getRequestType()) {
 
-                        case USER:
+                        case CREATE:
 
-                            //читаем из реквеста обьект и приводим к нужному классу, записываем данные в БД и получаем результат записи
-                            User obj2 = (User) request.getData();
-                            DataManager.getInstance().addUser(obj2);
-                            DBHandler handler = DBHandler.getInstance();
-                            int reg = handler.Create(obj2);
+                            handler = DBHandler.getInstance();
+                            //отправляем обьект MyRequest в нужный метод DBHandler и получаем ответ
+                            request2 = handler.Create(request);
                             //записываем и передаем ответ в виде обьекта MyRequest
-                            request2 = new MyRequest(MyRequest.RequestType.INT, reg);
                             oos.writeObject(request2);
                             oos.flush();
 
                             break;
 
-                        case LIST:
+                        case READ:
 
-                            ArrayList obj3 = (ArrayList) request.getData();
-                            String login = (String) obj3.get(0);
-                            String password = (String) obj3.get(1);
-                            DBHandler handler2 = DBHandler.getInstance();
-                            MyRequest request3 = handler2.Read(login, password);
-                            oos.writeObject(request3);
+                            handler = DBHandler.getInstance();
+                            //отправляем обьект MyRequest в нужный метод DBHandler и получаем ответ
+                            request2 = handler.Read(request);
+                            //записываем и передаем ответ в виде обьекта MyRequest
+                            oos.writeObject(request2);
                             oos.flush();
+
+                            break;
+
+                        case UPDATE:
+
+                           break;
+
+                        case DELETE:
 
                             break;
                     }

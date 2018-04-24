@@ -1,10 +1,11 @@
 package BD;
 
-import manager.DataManager;
+import models.Table.SellerMaterialTable;
 import models.UserBuilder.User;
 import net.MyRequest;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 // соединение с базой (Singltone)
 public class DBHandler extends Configs {
@@ -22,8 +23,12 @@ public class DBHandler extends Configs {
         return instance;
     }
 
-    Connection dbconnection;
-    PreparedStatement pst;
+    private Connection dbconnection;
+    private PreparedStatement pst;
+    private MyRequest request;
+    private String q1;
+    private String login;
+    private String password;
 
     //подключение
     public Connection getConnection() {
@@ -46,128 +51,253 @@ public class DBHandler extends Configs {
     }
 
 
-    //суть фасада, использовать обобщения с switch внутри
-    public int Create(User user) {
-        //создаем соединение и формируем запросы к БД
-        DataManager manager = DataManager.getInstance();
+    public MyRequest Create(MyRequest r) {
+        //создаем соединение
         DBHandler handler = DBHandler.getInstance();
         Connection connection = handler.getConnection();
-        int count = 0;
+        int count;
+        String q1;
+        String insert;
 
-        String q1 = "SELECT * from users where login=?";
-        String insert = "INSERT INTO /**noise.**/users(names,city,adress,mail,phone,login,password)"
-                + "VALUES (?,?,?,?,?,?,?)";
-        //если User был успешно создан в программе(с учетом проверки данных), проверям на повтор логина
-        if (user != null) {
-            try {
-                pst = (com.mysql.jdbc.PreparedStatement) connection.prepareStatement(q1);
-                pst.setString(1, user.getLogin());
-                ResultSet rs = pst.executeQuery();
+        //проверяем тип обьекта
+        switch (r.getRequestTypeB()){
 
-                while (rs.next()) {
-                    count++;
+            case USER:
+
+                //читаем из реквеста обьект и приводим к нужному классу
+                User user = (User) r.getData();
+
+                //формируем запросы к БД
+                count = 0;
+                q1 = "SELECT * from users where login=?";
+                insert = "INSERT INTO /**noise.**/users(names,city,adress,mail,phone,login,password)"
+                        + "VALUES (?,?,?,?,?,?,?)";
+
+                //если User был успешно создан в программе(с учетом проверки данных), проверям на повтор логина
+                if (user != null) {
+                    try {
+                        pst = (com.mysql.jdbc.PreparedStatement) connection.prepareStatement(q1);
+                        pst.setString(1, user.getLogin());
+                        ResultSet rs = pst.executeQuery();
+
+                        while (rs.next()) {
+                            count++;
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        //загружаем user в БД
-        if (count == 0 && user != null){
+                //загружаем user в БД
+                if (count == 0 && user != null){
 
-            try {
-                pst = connection.prepareStatement(insert);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+                    try {
+                        pst = connection.prepareStatement(insert);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
 
-            try {
-                pst.setString(1, user.getName());
-                pst.setString(2, user.getCity());
-                pst.setString(3, user.getAdress());
-                pst.setString(4, user.getMail());
-                pst.setString(5, user.getPhone());
-                pst.setString(6, user.getLogin());
-                pst.setString(7, user.getPassword());
+                    try {
+                        pst.setString(1, user.getName());
+                        pst.setString(2, user.getCity());
+                        pst.setString(3, user.getAdress());
+                        pst.setString(4, user.getMail());
+                        pst.setString(5, user.getPhone());
+                        pst.setString(6, user.getLogin());
+                        pst.setString(7, user.getPassword());
 
-                pst.executeUpdate();
+                        pst.executeUpdate();
 
 
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } finally {
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            connection.close();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    count=2;
+
+                }
+                //запаковываем ответ в MyRequest
+                request = new MyRequest(MyRequest.RequestType.ANSWER,MyRequest.RequestTypeB.INT, count);
+
+                break;
+
+
+            case LIST_NEW_PRODUCT:
+
+                //читаем из реквеста обьект и приводим к нужному классу
+                ArrayList list = (ArrayList) r.getData();
+
+                //формируем запросы к БД
+                count = 1;
+                insert = "INSERT INTO /**noise.**/product(manufactured, type, name, secondName, area, depth, classMat, cost, owner)"
+                        + "VALUES (?,?,?,?,?,?,?,?,?)";
+
+                //загружаем product в БД
                 try {
-                    connection.close();
+                    pst = connection.prepareStatement(insert);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-            }
 
-            count=2;
+                try {
+                    pst.setString(1, (String) list.get(0));
+                    pst.setString(2, (String) list.get(1));
+                    pst.setString(3, (String) list.get(2));
+                    pst.setString(4, (String) list.get(3));
+                    pst.setString(5, (String) list.get(4));
+                    pst.setString(6, (String) list.get(5));
+                    pst.setString(7, (String) list.get(6));
+                    pst.setString(8, (String) list.get(7));
+                    pst.setString(9, (String) list.get(8));
+
+                    pst.executeUpdate();
+
+                    count = 0;
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        connection.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                //запаковываем ответ в MyRequest
+                request = new MyRequest(MyRequest.RequestType.ANSWER,MyRequest.RequestTypeB.INT, count);
+
+                break;
+
         }
+
         //возвращаем значение count для определения результата операции
-        return count;
+        return request;
     }
-    public MyRequest Read(String login, String password) {
+    public MyRequest Read(MyRequest r) {
 
-        MyRequest request = null;
-        int count = 0;
+        //создаем соединение
         DBHandler handler = DBHandler.getInstance();
-        User user;
-
-        //Проверка соответствия логина и пароля
         Connection connection = handler.getConnection();
-        String q1 = "SELECT * from users where login=? and password=?";
+
+        ArrayList list;
+        int count;
+
+        //проверяем тип обьекта
+        switch (r.getRequestTypeB()){
+
+            case LIST_SIGN_IN:
+
+                //читаем из реквеста обьект и приводим к нужному классу
+                list = (ArrayList) r.getData();
+                login = (String) list.get(0);
+                password = (String) list.get(1);
+
+                //формируем запросы к БД и проверяем соответствие логина и пароля
+                count = 0;
+                User user;
+                q1 = "SELECT * from users where login=? and password=?";
+
+                try {
+                    pst = (com.mysql.jdbc.PreparedStatement) connection.prepareStatement(q1);
+
+                    pst.setString(1, login);
+                    pst.setString(2, password);
+                    ResultSet rs = pst.executeQuery();
 
 
-        try {
-            pst = (com.mysql.jdbc.PreparedStatement) connection.prepareStatement(q1);
+                    while (rs.next()) {
+                        count++;
+                    }
 
-            pst.setString(1, login);
-            pst.setString(2, password);
-            ResultSet rs = pst.executeQuery();
+                    if (count == 1) {
+                        //вернуться к найденой записи с логином и паролем  и загрузить данные User в ответ
+                        rs.previous();
+                        user =  new User.Builder()
+                                .setName(rs.getString(2))
+                                .setCity(rs.getString(3))
+                                .setAdress(rs.getString(4))
+                                .setMail(rs.getString(5))
+                                .setPhone(rs.getString(6))
+                                .setLogin(rs.getString(7))
+                                .setPassword(rs.getString(8))
+                                .setSeller(rs.getString(9))
+                                .build();
 
+                        request = new MyRequest(MyRequest.RequestType.ANSWER, MyRequest.RequestTypeB.USER, user);
 
-            while (rs.next()) {
-                count++;
-            }
+                    //в случае отсутствия совпадений логин/пароль
+                    } else {
+                        request = new MyRequest(MyRequest.RequestType.ANSWER, MyRequest.RequestTypeB.USER, null);
+                    }
 
-            if (count == 1) {
-                //вернуться к найденой записи с логином и паролем  и загрузить данные User в ответ
-                rs.previous();
-                user =  new User.Builder()
-                        .setName(rs.getString(2))
-                        .setCity(rs.getString(3))
-                        .setAdress(rs.getString(4))
-                        .setMail(rs.getString(5))
-                        .setPhone(rs.getString(6))
-                        .setLogin(rs.getString(7))
-                        .setPassword(rs.getString(8))
-                        .build();
-                request = new MyRequest(MyRequest.RequestType.USER, user);
+                } catch (SQLException e) {
+                    e.printStackTrace();
 
-            //в случае отсутствия совпадений логин/пароль
-            } else {
-                request = new MyRequest(MyRequest.RequestType.USER, null);
-            }
+                    //закрываем соединение с БД
+                } finally {
+                    try {
+                        connection.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            //закрываем соединение с БД
-        } finally {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+                break;
+
+            case LIST_MY_PRODUCT:
+
+                //читаем из реквеста обьект и приводим к нужному классу
+                list = (ArrayList) r.getData();
+                login = (String) list.get(0);
+
+                ArrayList list2 = new ArrayList<>();
+
+                //формируем запросы к БД
+                q1 = "SELECT * from product where owner=?";
+
+                try {
+                    pst = (com.mysql.jdbc.PreparedStatement) connection.prepareStatement(q1);
+
+                    pst.setString(1, login);
+                    ResultSet rs = pst.executeQuery();
+
+                    //в цикле достаем из ответа строки и записываем их в коллекцию в виде обьектов SellerMaterialTable
+                    while (rs.next()) {
+                        list2.add( new SellerMaterialTable(rs.getString(2), rs.getString(3), rs.getString(4),
+                                rs.getString(5), Double.parseDouble(rs.getString(6)), Double.parseDouble(rs.getString(7)),
+                                rs.getString(8), Double.parseDouble(rs.getString(9))));
+                    }
+
+                    //записываем ответ
+                    request = new MyRequest(MyRequest.RequestType.ANSWER, MyRequest.RequestTypeB.LIST_MY_PRODUCT, list2);
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                  //закрываем соединение с БД
+                } finally {
+                    try {
+                        connection.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                break;
+
         }
-
-            return request;
-}
-    public boolean Update(User user){
-        return true;
+        return request;
     }
-    public boolean Delete(User user) {
-        return true;
+    public MyRequest Update(MyRequest r){
+        return request;
+    }
+    public MyRequest Delete(MyRequest r) {
+        return request;
     }
 
 }
