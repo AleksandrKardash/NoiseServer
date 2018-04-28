@@ -1,10 +1,13 @@
 package BD;
 
+import models.Table.MaterialTable;
 import models.Table.SellerMaterialTable;
+import models.Table.SellerTable;
 import models.UserBuilder.User;
 import net.MyRequest;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 // соединение с базой (Singltone)
@@ -27,6 +30,7 @@ public class DBHandler extends Configs {
     private PreparedStatement pst;
     private MyRequest request;
     private String q1;
+    private String q2;
     private String login;
     private String password;
 
@@ -174,6 +178,72 @@ public class DBHandler extends Configs {
 
                 break;
 
+            case ORDER:
+
+                //читаем из реквеста обьект и приводим к нужному классу
+                SellerTable seller = (SellerTable) r.getData();
+                User customer = (User) r.getDataB();
+                ArrayList<MaterialTable> listProduct = seller.getListProduct();
+
+                //формируем запросы к БД
+                count = 1;
+                int id = 0;
+                insert = "INSERT INTO /**noise.**/orders(customer_login, order_date, amount, seller_name)"
+                        + "VALUES (?,?,?,?)";
+
+
+                //загружаем order в БД
+                try {
+                    //записываем данные и получаем ID созданной строки
+                    pst = connection.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS);
+
+                    pst.setString(1, customer.getLogin());
+                    pst.setDate(2,  new java.sql.Date(new java.util.Date().getTime()));
+                    pst.setDouble(3, seller.getCost());
+                    pst.setString(4, seller.getSeller());
+
+                    pst.executeUpdate();
+
+                    ResultSet rs = pst.getGeneratedKeys();
+                    if (rs.next()){
+                        id=rs.getInt(1);
+                    }
+
+
+                    //записываем материалы относящиеся к только созданному заказу
+                    for (MaterialTable i: listProduct) {
+                        insert = "INSERT INTO /**noise.**/items_order(orders_id, name, area, depth, count)"
+                                + "VALUES (?,?,?,?,?)";
+
+                        pst = connection.prepareStatement(insert);
+
+                        pst.setInt(1, id);
+                        pst.setString(2, i.getNameMat());
+                        pst.setDouble(3, i.getAreaMat());
+                        pst.setDouble(4, i.getDepthMat());
+                        pst.setDouble(5, i.getCountMat());
+
+                        pst.executeUpdate();
+
+                    }
+
+                    count = 0;
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        connection.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                //запаковываем ответ в MyRequest
+                request = new MyRequest(MyRequest.RequestType.ANSWER,MyRequest.RequestTypeB.INT, count);
+
+                break;
+
         }
 
         //возвращаем значение count для определения результата операции
@@ -269,9 +339,11 @@ public class DBHandler extends Configs {
 
                     //в цикле достаем из ответа строки и записываем их в коллекцию в виде обьектов SellerMaterialTable
                     while (rs.next()) {
+
                         list2.add( new SellerMaterialTable(rs.getString(2), rs.getString(3), rs.getString(4),
                                 rs.getString(5), Double.parseDouble(rs.getString(6)), Double.parseDouble(rs.getString(7)),
                                 rs.getString(8), Double.parseDouble(rs.getString(9))));
+
                     }
 
                     //записываем ответ
@@ -280,6 +352,102 @@ public class DBHandler extends Configs {
                 } catch (SQLException e) {
                     e.printStackTrace();
                   //закрываем соединение с БД
+                } finally {
+                    try {
+                        connection.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                break;
+
+            case LIST_FIND_SELLER:
+
+                //читаем из реквеста обьект и приводим к нужному классу
+                list = (ArrayList) r.getData();
+                ArrayList<MaterialTable> listB = (ArrayList<MaterialTable>) r.getDataB();
+                String city = (String) list.get(0);
+                String grade = (String) list.get(1);
+
+                //коллекци для записи ответа
+                ArrayList<SellerTable> listSellerFromCity = new ArrayList<>();
+                ArrayList<MaterialTable> listChoiseProduct = null;
+
+                //формируем запросы к БД
+                q1 = "SELECT * from sellers where city=?";
+                q2 = "SELECT * from product where idsellers=?";
+
+
+                try {
+                    pst = (com.mysql.jdbc.PreparedStatement) connection.prepareStatement(q1);
+
+                    pst.setString(1, city);
+                    ResultSet rs = pst.executeQuery();
+
+                    //в цикле подбираем из ответа подходящих продавцов и записываем их в коллекцию в виде обьектов SellerTable
+                    while (rs.next()) {
+
+                        //создаем новую коллекцию материалов для каждого продавца
+                        listChoiseProduct = new ArrayList<>();
+
+                        //получаем все материалы, принадлежащие текущему продавцу
+                        String idSeller = rs.getString(1);
+                        pst = (com.mysql.jdbc.PreparedStatement) connection.prepareStatement(q2);
+                        pst.setString(1, idSeller);
+                        ResultSet rsB = pst.executeQuery();
+
+                        //переменные для рассчета стоимости
+                        Double value = 0.0;
+                        Double cost;
+
+                        //проходим по каждому материалу текущего продавца
+                        while (rsB.next()) {
+
+                            cost = 0.0;
+                            ArrayList<MaterialTable> cloneListB = new ArrayList<MaterialTable>();
+                            for (MaterialTable i: listB) {cloneListB.add(new MaterialTable(i.getNameMat(), i.getAreaMat(), i.getDepthMat(), i.getCountMat()));}
+
+                            //сравниваем каждый материал из присланного списка с текущим материалом из базы
+                            for (int i = 0; i < cloneListB.size(); i++){
+
+                                if (cloneListB.get(i).getNameMat().equals(rsB.getString("type")) &&
+                                  cloneListB.get(i).getDepthMat()==Math.floor(Double.parseDouble(rsB.getString("depth"))) &&
+                                  grade.equals(rsB.getString("classMat"))){
+
+                                    //считаем стоимость
+                                    cost = cloneListB.get(i).getCountMat() * Double.parseDouble(rsB.getString("cost"));
+
+                                    //записываем подобранный материал в коллекцию
+                                    listChoiseProduct.add(new MaterialTable(rsB.getString("type") + " " + rsB.getString("manufactured") + " " +
+                                            rsB.getString("name") + " " + rsB.getString("secondName"), Double.parseDouble(rsB.getString("area")),
+                                            Double.parseDouble(rsB.getString("depth")), listB.get(i).getCountMat()));
+
+                                    //помечаем уже найденный материал, исключая его из подбора
+                                    cloneListB.get(i).setNameMat("delete");
+
+                                }
+
+                            }
+
+                            //увеличиваем стоимость на сумму каждой подобранной позиции
+                            value += cost;
+
+                        }
+
+                        //заполняем данными SellerTable
+                        //клонируем коллекцию с подобранными материалами и обнуляем ее для дальнейшей работы
+                        listSellerFromCity.add( new SellerTable(rs.getString(2), rs.getString(6), value,
+                                rs.getString(4), listChoiseProduct));
+
+                    }
+
+                    //записываем ответ
+                    request = new MyRequest(MyRequest.RequestType.ANSWER, MyRequest.RequestTypeB.LIST_FIND_SELLER, listSellerFromCity);
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    //закрываем соединение с БД
                 } finally {
                     try {
                         connection.close();

@@ -82,6 +82,7 @@ class ThreadEchoHandler implements Runnable {
             try{
                 //читаем обьект MyRequest в цикле
                 while ((obj = ois.readObject())!=null) {
+
                     request = (MyRequest) obj; // приводит сначала к типу базового реквеста
 
                     // получаем тип запроса, а потом в зависимости от типа запроса отправляем в нужный метод DBHandler
