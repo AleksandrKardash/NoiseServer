@@ -112,9 +112,23 @@ class ThreadEchoHandler implements Runnable {
 
                         case UPDATE:
 
+                            handler = DBHandler.getInstance();
+                            //отправляем обьект MyRequest в нужный метод DBHandler и получаем ответ
+                            request2 = handler.Update(request);
+                            //записываем и передаем ответ в виде обьекта MyRequest
+                            oos.writeObject(request2);
+                            oos.flush();
+
                            break;
 
                         case DELETE:
+
+                            handler = DBHandler.getInstance();
+                            //отправляем обьект MyRequest в нужный метод DBHandler и получаем ответ
+                            request2 = handler.Delete(request);
+                            //записываем и передаем ответ в виде обьекта MyRequest
+                            oos.writeObject(request2);
+                            oos.flush();
 
                             break;
                     }

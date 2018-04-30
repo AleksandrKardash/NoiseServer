@@ -7,7 +7,8 @@ public class MyRequest implements Serializable {
 
     //перечисление возможных типов передаваемых данных
     public static enum RequestType {CREATE, READ, UPDATE, DELETE, ANSWER};
-    public static enum RequestTypeB {USER, CAR, LIST_SIGN_IN, LIST_NEW_PRODUCT, LIST_MY_PRODUCT, LIST_FIND_SELLER, INT, ORDER};
+    public static enum RequestTypeB {USER, CAR, LIST_SIGN_IN, LIST_NEW_PRODUCT, LIST_MY_PRODUCT, LIST_FIND_SELLER,
+        LIST_MY_ORDERS, CONFIRM_ORDER, INT, ORDER};
 
     private RequestType mType;
     private RequestTypeB mTypeB;

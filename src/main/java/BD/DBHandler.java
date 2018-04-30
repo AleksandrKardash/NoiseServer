@@ -2,6 +2,7 @@ package BD;
 
 import models.Table.MaterialTable;
 import models.Table.SellerMaterialTable;
+import models.Table.SellerOrders;
 import models.Table.SellerTable;
 import models.UserBuilder.User;
 import net.MyRequest;
@@ -256,6 +257,7 @@ public class DBHandler extends Configs {
         Connection connection = handler.getConnection();
 
         ArrayList list;
+        ArrayList listAnswer;
         int count;
 
         //проверяем тип обьекта
@@ -458,10 +460,128 @@ public class DBHandler extends Configs {
 
                 break;
 
+            case LIST_MY_ORDERS:
+
+                //читаем из реквеста обьект и приводим к нужному классу
+                list = (ArrayList) r.getData();
+                login = (String) list.get(0);
+
+                listAnswer = new ArrayList<>();
+                ArrayList<MaterialTable> listProductOrder;
+
+                //формируем запросы к БД
+                q1 = "SELECT idorders, customer_login, order_date, amount, processed, adress, phone FROM noise.orders\n" +
+                        "JOIN noise.users  ON noise.orders.customer_login=noise.users.login\n" +
+                        "WHERE seller_name IN (SELECT name FROM noise.sellers \n" +
+                        "WHERE idusers IN (SELECT idusers FROM noise.users \n" +
+                        "WHERE login=?));";
+                q2 = "SELECT * FROM noise.items_order\n" +
+                        "WHERE orders_id=?;";
+
+                try {
+                    pst = (com.mysql.jdbc.PreparedStatement) connection.prepareStatement(q1);
+
+                    pst.setString(1, login);
+                    ResultSet rs = pst.executeQuery();
+
+                    //создаем новую коллекцию материалов для каждого продавца
+                    listProductOrder = new ArrayList<MaterialTable>();
+
+                    //в цикле достаем из ответа строки и записываем их в коллекцию в виде обьектов SellerOrder
+                    while (rs.next()) {
+
+                        listAnswer.add( new SellerOrders(rs.getInt("idorders"), rs.getString("adress"), rs.getString("phone"),
+                                rs.getDouble("amount"), rs.getDate("order_date"), rs.getString("processed"), listProductOrder));
+
+
+                        //получаем все материалы, принадлежащие текущему продавцу
+                        String idOrder = rs.getString(1);
+                        pst = (com.mysql.jdbc.PreparedStatement) connection.prepareStatement(q2);
+                        pst.setString(1, idOrder);
+                        ResultSet rsB = pst.executeQuery();
+
+
+                        //для каждого заказа записываем список материалов
+                        while (rsB.next()) {
+
+                            listProductOrder.add(new MaterialTable(rsB.getString("name"), rsB.getDouble("area"),
+                                    rsB.getDouble("depth"), rsB.getDouble("count")));
+
+                        }
+
+                    }
+
+                    //записываем ответ
+                    request = new MyRequest(MyRequest.RequestType.ANSWER, MyRequest.RequestTypeB.LIST_MY_ORDERS, listAnswer);
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    //закрываем соединение с БД
+                } finally {
+                    try {
+                        connection.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                break;
+
         }
         return request;
     }
     public MyRequest Update(MyRequest r){
+
+        //создаем соединение
+        DBHandler handler = DBHandler.getInstance();
+        Connection connection = handler.getConnection();
+        int count;
+        String q1;
+        String update;
+
+        //проверяем тип обьекта
+        switch (r.getRequestTypeB()) {
+
+            case CONFIRM_ORDER:
+
+                //читаем из реквеста обьект и приводим к нужному классу
+                SellerOrders confirmOrder = (SellerOrders) r.getData();
+
+                //формируем запросы к БД
+                count = 1;
+                update = "UPDATE orders SET processed = 'yes' WHERE idorders = ?;";
+
+                //загружаем product в БД
+                try {
+                    pst = connection.prepareStatement(update);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    pst.setInt(1, confirmOrder.getIdOrder());
+
+                    pst.executeUpdate();
+
+                    count = 0;
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        connection.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                //запаковываем ответ в MyRequest
+                request = new MyRequest(MyRequest.RequestType.ANSWER,MyRequest.RequestTypeB.INT, count);
+
+                break;
+
+
+        }
         return request;
     }
     public MyRequest Delete(MyRequest r) {
