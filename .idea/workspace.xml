@@ -2,13 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8c82c908-bdcc-4771-86eb-3f7068427347" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/models/Table/SellerOrders.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/classes/BD/DBHandler$1.class" afterPath="$PROJECT_DIR$/out/production/classes/BD/DBHandler$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/classes/BD/DBHandler.class" afterPath="$PROJECT_DIR$/out/production/classes/BD/DBHandler.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/classes/net/MyRequest$RequestTypeB.class" afterPath="$PROJECT_DIR$/out/production/classes/net/MyRequest$RequestTypeB.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/BD/DBHandler.java" afterPath="$PROJECT_DIR$/src/main/java/BD/DBHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/net/Communication.java" afterPath="$PROJECT_DIR$/src/main/java/net/Communication.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/models/Table/SellerMaterialTable.java" afterPath="$PROJECT_DIR$/src/main/java/models/Table/SellerMaterialTable.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/net/MyRequest.java" afterPath="$PROJECT_DIR$/src/main/java/net/MyRequest.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -55,30 +51,36 @@
       <file leaf-file-name="DBHandler.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/BD/DBHandler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="544" column="31" lean-forward="true" selection-start-line="544" selection-start-column="31" selection-end-line="544" selection-end-column="31" />
+            <state relative-caret-position="246">
+              <caret line="546" column="61" lean-forward="true" selection-start-line="546" selection-start-column="61" selection-end-line="546" selection-end-column="61" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#DBHandler#0;class#DBHandler#0" expanded="false" />
                 <element signature="method#getInstance#0;class#DBHandler#0" expanded="false" />
                 <element signature="method#getConnection#0;class#DBHandler#0" expanded="false" />
                 <element signature="method#Create#0;class#DBHandler#0" expanded="false" />
-                <element signature="method#Read#0;class#DBHandler#0" expanded="false" />
-                <marker date="1525077500148" expanded="true" signature="2023:2056" ph=" SELECT statement (USERS)" />
-                <marker date="1525077500148" expanded="true" signature="2085:2210" ph=" INSERT statement (USERS)" />
-                <marker date="1525077500148" expanded="true" signature="4468:4628" ph=" INSERT statement (PRODUCT)" />
-                <marker date="1525077500148" expanded="true" signature="6409:6530" ph=" INSERT statement (ORDERS)" />
-                <marker date="1525077500148" expanded="true" signature="6409:6533" ph=" INSERT statement (ORDERS)" />
-                <marker date="1525077500148" expanded="true" signature="7404:7531" ph=" INSERT statement (ITEMS_ORDER)" />
-                <marker date="1525077500148" expanded="true" signature="9322:9370" ph=" SELECT statement (USERS)" />
-                <marker date="1525077500148" expanded="true" signature="11543:11578" ph=" SELECT statement (USERS)" />
-                <marker date="1525077500148" expanded="true" signature="13459:13493" ph=" SELECT statement (SELLERS)" />
-                <marker date="1525077500148" expanded="true" signature="13518:13557" ph=" SELECT statement (PRODUCT)" />
-                <marker date="1525077500148" expanded="true" signature="17854:18258" ph=" SELECT statement (SELLERS, ORDERS, USERS)" />
-                <marker date="1525077500148" expanded="true" signature="18283:18363" ph=" SELECT statement (ITEMS_ORDER)" />
-                <marker date="1525077500148" expanded="true" signature="21047:21076" ph=" UPDATE statement (ORDERS)" />
-                <marker date="1525077500148" expanded="true" signature="21047:21081" ph=" UPDATE statement (ORDERS)" />
-                <marker date="1525077500148" expanded="true" signature="21047:21102" ph=" INSERT statement (PRODUCT)" />
+                <element signature="e#14866#14881#0" expanded="true" />
+                <element signature="method#Update#0;class#DBHandler#0" expanded="false" />
+                <element signature="method#Delete#0;class#DBHandler#0" expanded="false" />
+                <marker date="1525173952124" expanded="true" signature="2049:2082" ph=" SELECT statement (USERS)" />
+                <marker date="1525173952124" expanded="true" signature="2111:2236" ph=" INSERT statement (USERS)" />
+                <marker date="1525173952124" expanded="true" signature="4494:4654" ph=" INSERT statement (PRODUCT)" />
+                <marker date="1525173952124" expanded="true" signature="6435:6556" ph=" INSERT statement (ORDERS)" />
+                <marker date="1525173952124" expanded="true" signature="6435:6559" ph=" INSERT statement (ORDERS)" />
+                <marker date="1525173952124" expanded="true" signature="7430:7557" ph=" INSERT statement (ITEMS_ORDER)" />
+                <marker date="1525173952124" expanded="true" signature="9348:9396" ph=" SELECT statement (USERS)" />
+                <marker date="1525173952124" expanded="true" signature="11569:11604" ph=" SELECT statement (USERS)" />
+                <marker date="1525173952124" expanded="true" signature="13499:13533" ph=" SELECT statement (SELLERS)" />
+                <marker date="1525173952124" expanded="true" signature="13558:13597" ph=" SELECT statement (PRODUCT)" />
+                <marker date="1525173952124" expanded="true" signature="17894:18298" ph=" SELECT statement (SELLERS, ORDERS, USERS)" />
+                <marker date="1525173952124" expanded="true" signature="18323:18403" ph=" SELECT statement (ITEMS_ORDER)" />
+                <marker date="1525173952124" expanded="true" signature="20615:20641" ph=" SELECT statement (PRODUCT)" />
+                <marker date="1525173952124" expanded="true" signature="20615:20648" ph=" SELECT statement (SELLERS)" />
+                <marker date="1525173952124" expanded="true" signature="22248:22277" ph=" UPDATE statement (ORDERS)" />
+                <marker date="1525173952124" expanded="true" signature="22248:22282" ph=" UPDATE statement (ORDERS)" />
+                <marker date="1525173952124" expanded="true" signature="22248:22303" ph=" INSERT statement (PRODUCT)" />
+                <marker date="1525173952124" expanded="true" signature="23818:23856" ph=" UPDATE statement (ORDERS)" />
+                <marker date="1525173952124" expanded="true" signature="25030:25071" ph=" DELETE statement (PRODUCT)" />
               </folding>
             </state>
           </provider>
@@ -87,8 +89,8 @@
       <file leaf-file-name="Communication.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/net/Communication.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="112" column="36" lean-forward="true" selection-start-line="112" selection-start-column="36" selection-end-line="112" selection-end-column="36" />
+            <state relative-caret-position="540">
+              <caret line="127" column="36" lean-forward="true" selection-start-line="127" selection-start-column="36" selection-end-line="127" selection-end-column="36" />
               <folding />
             </state>
           </provider>
@@ -424,17 +426,17 @@
         <option value="$PROJECT_DIR$/src/main/java/manager/DataManager.java" />
         <option value="$PROJECT_DIR$/src/main/java/Table/MaterialTable.java" />
         <option value="$PROJECT_DIR$/src/main/java/Table/test.java" />
-        <option value="$PROJECT_DIR$/src/main/java/models/Table/SellerMaterialTable.java" />
         <option value="$PROJECT_DIR$/src/main/java/models/Table/MaterialTable.java" />
         <option value="$PROJECT_DIR$/src/main/java/models/Table/SellerTable.java" />
         <option value="$PROJECT_DIR$/src/main/java/models/Table/SellerOrders.java" />
-        <option value="$PROJECT_DIR$/src/main/java/net/MyRequest.java" />
         <option value="$PROJECT_DIR$/src/main/java/net/Communication.java" />
+        <option value="$PROJECT_DIR$/src/main/java/models/Table/SellerMaterialTable.java" />
+        <option value="$PROJECT_DIR$/src/main/java/net/MyRequest.java" />
         <option value="$PROJECT_DIR$/src/main/java/BD/DBHandler.java" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="736" />
     <option name="y" value="8" />
     <option name="width" value="747" />
@@ -455,9 +457,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
-      <pane id="Scratches" />
       <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
@@ -561,6 +560,9 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -740,7 +742,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1616" height="876" extended-state="7" />
+    <frame x="-8" y="-8" width="1616" height="876" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -753,12 +755,12 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293011" sideWeight="0.5" order="11" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3077957" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3077957" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19601542" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19858612" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -953,7 +955,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
           <caret line="4" column="13" lean-forward="false" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -972,19 +973,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/models/Table/SellerMaterialTable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="5" column="56" lean-forward="false" selection-start-line="5" selection-start-column="56" selection-end-line="5" selection-end-column="56" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/models/Table/SellerTable.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
           <caret line="11" column="69" lean-forward="true" selection-start-line="11" selection-start-column="4" selection-end-line="11" selection-end-column="69" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -998,14 +990,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/net/MyRequest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="629">
-          <caret line="45" column="1" lean-forward="false" selection-start-line="45" selection-start-column="1" selection-end-line="45" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/models/Table/SellerOrders.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
@@ -1016,38 +1000,60 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/net/Communication.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="112" column="36" lean-forward="true" selection-start-line="112" selection-start-column="36" selection-end-line="112" selection-end-column="36" />
+        <state relative-caret-position="540">
+          <caret line="127" column="36" lean-forward="true" selection-start-line="127" selection-start-column="36" selection-end-line="127" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/models/Table/SellerMaterialTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="577">
+          <caret line="116" column="0" lean-forward="true" selection-start-line="116" selection-start-column="0" selection-end-line="116" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/net/MyRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="629">
+          <caret line="45" column="1" lean-forward="false" selection-start-line="45" selection-start-column="1" selection-end-line="45" selection-end-column="1" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/BD/DBHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="544" column="31" lean-forward="true" selection-start-line="544" selection-start-column="31" selection-end-line="544" selection-end-column="31" />
+        <state relative-caret-position="246">
+          <caret line="546" column="61" lean-forward="true" selection-start-line="546" selection-start-column="61" selection-end-line="546" selection-end-column="61" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#DBHandler#0;class#DBHandler#0" expanded="false" />
             <element signature="method#getInstance#0;class#DBHandler#0" expanded="false" />
             <element signature="method#getConnection#0;class#DBHandler#0" expanded="false" />
             <element signature="method#Create#0;class#DBHandler#0" expanded="false" />
-            <element signature="method#Read#0;class#DBHandler#0" expanded="false" />
-            <marker date="1525077500148" expanded="true" signature="2023:2056" ph=" SELECT statement (USERS)" />
-            <marker date="1525077500148" expanded="true" signature="2085:2210" ph=" INSERT statement (USERS)" />
-            <marker date="1525077500148" expanded="true" signature="4468:4628" ph=" INSERT statement (PRODUCT)" />
-            <marker date="1525077500148" expanded="true" signature="6409:6530" ph=" INSERT statement (ORDERS)" />
-            <marker date="1525077500148" expanded="true" signature="6409:6533" ph=" INSERT statement (ORDERS)" />
-            <marker date="1525077500148" expanded="true" signature="7404:7531" ph=" INSERT statement (ITEMS_ORDER)" />
-            <marker date="1525077500148" expanded="true" signature="9322:9370" ph=" SELECT statement (USERS)" />
-            <marker date="1525077500148" expanded="true" signature="11543:11578" ph=" SELECT statement (USERS)" />
-            <marker date="1525077500148" expanded="true" signature="13459:13493" ph=" SELECT statement (SELLERS)" />
-            <marker date="1525077500148" expanded="true" signature="13518:13557" ph=" SELECT statement (PRODUCT)" />
-            <marker date="1525077500148" expanded="true" signature="17854:18258" ph=" SELECT statement (SELLERS, ORDERS, USERS)" />
-            <marker date="1525077500148" expanded="true" signature="18283:18363" ph=" SELECT statement (ITEMS_ORDER)" />
-            <marker date="1525077500148" expanded="true" signature="21047:21076" ph=" UPDATE statement (ORDERS)" />
-            <marker date="1525077500148" expanded="true" signature="21047:21081" ph=" UPDATE statement (ORDERS)" />
-            <marker date="1525077500148" expanded="true" signature="21047:21102" ph=" INSERT statement (PRODUCT)" />
+            <element signature="e#14866#14881#0" expanded="true" />
+            <element signature="method#Update#0;class#DBHandler#0" expanded="false" />
+            <element signature="method#Delete#0;class#DBHandler#0" expanded="false" />
+            <marker date="1525173952124" expanded="true" signature="2049:2082" ph=" SELECT statement (USERS)" />
+            <marker date="1525173952124" expanded="true" signature="2111:2236" ph=" INSERT statement (USERS)" />
+            <marker date="1525173952124" expanded="true" signature="4494:4654" ph=" INSERT statement (PRODUCT)" />
+            <marker date="1525173952124" expanded="true" signature="6435:6556" ph=" INSERT statement (ORDERS)" />
+            <marker date="1525173952124" expanded="true" signature="6435:6559" ph=" INSERT statement (ORDERS)" />
+            <marker date="1525173952124" expanded="true" signature="7430:7557" ph=" INSERT statement (ITEMS_ORDER)" />
+            <marker date="1525173952124" expanded="true" signature="9348:9396" ph=" SELECT statement (USERS)" />
+            <marker date="1525173952124" expanded="true" signature="11569:11604" ph=" SELECT statement (USERS)" />
+            <marker date="1525173952124" expanded="true" signature="13499:13533" ph=" SELECT statement (SELLERS)" />
+            <marker date="1525173952124" expanded="true" signature="13558:13597" ph=" SELECT statement (PRODUCT)" />
+            <marker date="1525173952124" expanded="true" signature="17894:18298" ph=" SELECT statement (SELLERS, ORDERS, USERS)" />
+            <marker date="1525173952124" expanded="true" signature="18323:18403" ph=" SELECT statement (ITEMS_ORDER)" />
+            <marker date="1525173952124" expanded="true" signature="20615:20641" ph=" SELECT statement (PRODUCT)" />
+            <marker date="1525173952124" expanded="true" signature="20615:20648" ph=" SELECT statement (SELLERS)" />
+            <marker date="1525173952124" expanded="true" signature="22248:22277" ph=" UPDATE statement (ORDERS)" />
+            <marker date="1525173952124" expanded="true" signature="22248:22282" ph=" UPDATE statement (ORDERS)" />
+            <marker date="1525173952124" expanded="true" signature="22248:22303" ph=" INSERT statement (PRODUCT)" />
+            <marker date="1525173952124" expanded="true" signature="23818:23856" ph=" UPDATE statement (ORDERS)" />
+            <marker date="1525173952124" expanded="true" signature="25030:25071" ph=" DELETE statement (PRODUCT)" />
           </folding>
         </state>
       </provider>

@@ -10,6 +10,7 @@ import net.MyRequest;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.TreeSet;
 
 // соединение с базой (Singltone)
 public class DBHandler extends Configs {
@@ -342,7 +343,7 @@ public class DBHandler extends Configs {
                     //в цикле достаем из ответа строки и записываем их в коллекцию в виде обьектов SellerMaterialTable
                     while (rs.next()) {
 
-                        list2.add( new SellerMaterialTable(rs.getString(2), rs.getString(3), rs.getString(4),
+                        list2.add( new SellerMaterialTable(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4),
                                 rs.getString(5), Double.parseDouble(rs.getString(6)), Double.parseDouble(rs.getString(7)),
                                 rs.getString(8), Double.parseDouble(rs.getString(9))));
 
@@ -484,11 +485,12 @@ public class DBHandler extends Configs {
                     pst.setString(1, login);
                     ResultSet rs = pst.executeQuery();
 
-                    //создаем новую коллекцию материалов для каждого продавца
-                    listProductOrder = new ArrayList<MaterialTable>();
 
                     //в цикле достаем из ответа строки и записываем их в коллекцию в виде обьектов SellerOrder
                     while (rs.next()) {
+
+                        //создаем новую коллекцию материалов для каждого продавца
+                        listProductOrder = new ArrayList<MaterialTable>();
 
                         listAnswer.add( new SellerOrders(rs.getInt("idorders"), rs.getString("adress"), rs.getString("phone"),
                                 rs.getDouble("amount"), rs.getDate("order_date"), rs.getString("processed"), listProductOrder));
@@ -524,6 +526,42 @@ public class DBHandler extends Configs {
                         e.printStackTrace();
                     }
                 }
+
+                break;
+
+            case LIST_CITY:
+
+                listAnswer = new ArrayList<String>();
+
+                //формируем запросы к БД
+                q1 = "SELECT DISTINCT city FROM sellers";
+
+                try {
+                    pst = (com.mysql.jdbc.PreparedStatement) connection.prepareStatement(q1);
+
+                    ResultSet rs = pst.executeQuery();
+
+                    //в цикле достаем из ответа строки и записываем их в коллекцию в виде обьектов SellerMaterialTable
+                    while (rs.next()) {
+
+                        listAnswer.add(rs.getString("city"));
+
+                    }
+
+                    //записываем ответ
+                    request = new MyRequest(MyRequest.RequestType.ANSWER, MyRequest.RequestTypeB.LIST_CITY, listAnswer);
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    //закрываем соединение с БД
+                } finally {
+                    try {
+                        connection.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+
 
                 break;
 
@@ -585,6 +623,94 @@ public class DBHandler extends Configs {
         return request;
     }
     public MyRequest Delete(MyRequest r) {
+
+        //создаем соединение
+        DBHandler handler = DBHandler.getInstance();
+        Connection connection = handler.getConnection();
+        int count;
+        String q1;
+        String delete;
+
+        //проверяем тип обьекта
+        switch (r.getRequestTypeB()) {
+
+            case DELETE_ORDER:
+
+                //читаем из реквеста обьект и приводим к нужному классу
+                SellerOrders deleteOrders = (SellerOrders) r.getData();
+
+                //формируем запросы к БД
+                count = 1;
+                delete = "DELETE FROM orders WHERE idorders = ?;";
+
+                //загружаем product в БД
+                try {
+                    pst = connection.prepareStatement(delete);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    pst.setInt(1, deleteOrders.getIdOrder());
+
+                    pst.executeUpdate();
+
+                    count = 0;
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        connection.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                //запаковываем ответ в MyRequest
+                request = new MyRequest(MyRequest.RequestType.ANSWER,MyRequest.RequestTypeB.INT, count);
+
+                break;
+
+            case DELETE_PRODUCT:
+
+                //читаем из реквеста обьект и приводим к нужному классу
+                SellerMaterialTable deleteProduct = (SellerMaterialTable) r.getData();
+
+                //формируем запросы к БД
+                count = 1;
+                delete = "DELETE FROM product WHERE idproduct = ? ;";
+
+                //загружаем product в БД
+                try {
+                    pst = connection.prepareStatement(delete);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    pst.setInt(1, deleteProduct.getIdproduct());
+
+                    pst.executeUpdate();
+
+                    count = 0;
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        connection.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                //запаковываем ответ в MyRequest
+                request = new MyRequest(MyRequest.RequestType.ANSWER,MyRequest.RequestTypeB.INT, count);
+
+                break;
+
+        }
         return request;
     }
 

@@ -5,6 +5,7 @@ import java.io.Serializable;
 //класс для формирования таблицы "Мои материалы" для поставщика
 public class SellerMaterialTable implements Serializable {
 
+    private int idproduct;
     private String manufacturedProduct;
     private String typeProduct;
     private String nameProduct;
@@ -26,7 +27,23 @@ public class SellerMaterialTable implements Serializable {
         this.costProduct = costProduct;
     }
 
+    public SellerMaterialTable(int idproduct, String manufacturedProduct, String typeProduct, String nameProduct, String secondNameProduct, Double areaProduct, Double depthProduct, String classProduct, Double costProduct) {
+        this.idproduct = idproduct;
+        this.manufacturedProduct = manufacturedProduct;
+        this.typeProduct = typeProduct;
+        this.nameProduct = nameProduct;
+        this.secondNameProduct = secondNameProduct;
+        this.areaProduct = areaProduct;
+        this.depthProduct = depthProduct;
+        this.classProduct = classProduct;
+        this.costProduct = costProduct;
+    }
+
     public SellerMaterialTable() {
+    }
+
+    public void setIdproduct(int idproduct) {
+        this.idproduct = idproduct;
     }
 
     public void setManufacturedProduct(String manufacturedProduct) {
@@ -59,6 +76,10 @@ public class SellerMaterialTable implements Serializable {
 
     public void setCostProduct(Double costProduct) {
         this.costProduct = costProduct;
+    }
+
+    public int getIdproduct() {
+        return idproduct;
     }
 
     public String getManufacturedProduct() {
