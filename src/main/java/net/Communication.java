@@ -1,7 +1,7 @@
 package net;
 
 import BD.DBHandler;
-import UI.controller.MainController;
+import controller.MainController;
 import models.BuilderCar.Car;
 import models.UserBuilder.User;
 
@@ -12,7 +12,6 @@ import java.util.*;
 //сервер работает в многопоточном режиме. Для каждого подключившегося клиента создается новый поток
 public class Communication implements Runnable  {
 
-    private Socket client;
     static int numberOfOnline;
     //ссылка на controller для передачи данных в окно через метод setText
     public static MainController controller = null;
@@ -21,7 +20,7 @@ public class Communication implements Runnable  {
     public void run() {
         try {
             ServerSocket server = null;
-            client = null;
+            Socket client = null;
             try {
                 server = new ServerSocket(4444);
                 controller.setText("Waiting...");
@@ -51,22 +50,17 @@ public class Communication implements Runnable  {
             e.printStackTrace();
         }
     }
-
 }
-
 
 
 //Класс реализует интерфейс Runnable и в свое методе run() поддерживает взаимодействие с программой клиентом
 class ThreadEchoHandler implements Runnable {
-    public ThreadEchoHandler(Socket st) {
+    ThreadEchoHandler(Socket st) {
         client = st;
     }
 
-    private int a;
     private Socket client;
-
     private MyRequest request;
-    private MyRequest request2;
     private Object obj = null;
     private DBHandler handler = null;
 
@@ -83,18 +77,18 @@ class ThreadEchoHandler implements Runnable {
                 //читаем обьект MyRequest в цикле
                 while ((obj = ois.readObject())!=null) {
 
-                    request = (MyRequest) obj; // приводит сначала к типу базового реквеста
+                    MyRequest requestB = (MyRequest) obj;
 
                     // получаем тип запроса, а потом в зависимости от типа запроса отправляем в нужный метод DBHandler
-                    switch (request.getRequestType()) {
+                    switch (requestB.getRequestType()) {
 
                         case CREATE:
 
                             handler = DBHandler.getInstance();
                             //отправляем обьект MyRequest в нужный метод DBHandler и получаем ответ
-                            request2 = handler.Create(request);
+                            request = handler.Create(requestB);
                             //записываем и передаем ответ в виде обьекта MyRequest
-                            oos.writeObject(request2);
+                            oos.writeObject(request);
                             oos.flush();
 
                             break;
@@ -103,9 +97,9 @@ class ThreadEchoHandler implements Runnable {
 
                             handler = DBHandler.getInstance();
                             //отправляем обьект MyRequest в нужный метод DBHandler и получаем ответ
-                            request2 = handler.Read(request);
+                            request = handler.Read(requestB);
                             //записываем и передаем ответ в виде обьекта MyRequest
-                            oos.writeObject(request2);
+                            oos.writeObject(request);
                             oos.flush();
 
                             break;
@@ -114,9 +108,9 @@ class ThreadEchoHandler implements Runnable {
 
                             handler = DBHandler.getInstance();
                             //отправляем обьект MyRequest в нужный метод DBHandler и получаем ответ
-                            request2 = handler.Update(request);
+                            request = handler.Update(requestB);
                             //записываем и передаем ответ в виде обьекта MyRequest
-                            oos.writeObject(request2);
+                            oos.writeObject(request);
                             oos.flush();
 
                            break;
@@ -125,17 +119,16 @@ class ThreadEchoHandler implements Runnable {
 
                             handler = DBHandler.getInstance();
                             //отправляем обьект MyRequest в нужный метод DBHandler и получаем ответ
-                            request2 = handler.Delete(request);
+                            request = handler.Delete(requestB);
                             //записываем и передаем ответ в виде обьекта MyRequest
-                            oos.writeObject(request2);
+                            oos.writeObject(request);
                             oos.flush();
 
                             break;
                     }
                 }
 
-            }catch(Exception e){}
-
+            }catch(Exception ignored){}
             try {
                 bis.close();
             } catch (IOException e) {

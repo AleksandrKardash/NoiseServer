@@ -31,13 +31,14 @@ public class DBHandler extends Configs {
     private Connection dbconnection;
     private PreparedStatement pst;
     private MyRequest request;
+    private DBHandler handler;
+    private Connection connection;
     private String q1;
     private String q2;
-    private String login;
-    private String password;
+    private int count;
 
     //подключение
-    public Connection getConnection() {
+    private Connection getConnection() {
         //путь к БД
         String connectionString = "jdbc:mysql://" + Configs.dbhost + ":" + Configs.dbport + "/" + Configs.dbname + "?autoReconnect=true&useSSL=false";
         //загрузка драйвера
@@ -59,11 +60,8 @@ public class DBHandler extends Configs {
 
     public MyRequest Create(MyRequest r) {
         //создаем соединение
-        DBHandler handler = DBHandler.getInstance();
-        Connection connection = handler.getConnection();
-        int count;
-        String q1;
-        String insert;
+        handler = DBHandler.getInstance();
+        connection = handler.getConnection();
 
         //проверяем тип обьекта
         switch (r.getRequestTypeB()){
@@ -76,7 +74,7 @@ public class DBHandler extends Configs {
                 //формируем запросы к БД
                 count = 0;
                 q1 = "SELECT * from users where login=?";
-                insert = "INSERT INTO /**noise.**/users(names,city,adress,mail,phone,login,password)"
+                q2 = "INSERT INTO /**noise.**/users(names,city,adress,mail,phone,login,password)"
                         + "VALUES (?,?,?,?,?,?,?)";
 
                 //если User был успешно создан в программе(с учетом проверки данных), проверям на повтор логина
@@ -97,7 +95,7 @@ public class DBHandler extends Configs {
                 if (count == 0 && user != null){
 
                     try {
-                        pst = connection.prepareStatement(insert);
+                        pst = connection.prepareStatement(q2);
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
@@ -112,7 +110,6 @@ public class DBHandler extends Configs {
                         pst.setString(7, user.getPassword());
 
                         pst.executeUpdate();
-
 
                     } catch (SQLException e) {
                         e.printStackTrace();
@@ -132,7 +129,6 @@ public class DBHandler extends Configs {
 
                 break;
 
-
             case LIST_NEW_PRODUCT:
 
                 //читаем из реквеста обьект и приводим к нужному классу
@@ -140,12 +136,24 @@ public class DBHandler extends Configs {
 
                 //формируем запросы к БД
                 count = 1;
-                insert = "INSERT INTO /**noise.**/product(manufactured, type, name, secondName, area, depth, classMat, cost, owner)"
-                        + "VALUES (?,?,?,?,?,?,?,?,?)";
+                int a = 0;
+                q1 = "SELECT idsellers FROM noise.sellers WHERE idusers IN (SELECT idusers FROM noise.users WHERE login=?)";
+                q2 = "INSERT INTO /**noise.**/product(manufactured, type, name, secondName, area, depth, classMat, cost, owner, idsellers)"
+                        + "VALUES (?,?,?,?,?,?,?,?,?,?)";
 
+                try {
+                    pst = (com.mysql.jdbc.PreparedStatement) connection.prepareStatement(q1);
+                    pst.setString(1, (String) list.get(8));
+                    ResultSet rs = pst.executeQuery();
+                    rs.next();
+                    a = rs.getInt(1);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+               
                 //загружаем product в БД
                 try {
-                    pst = connection.prepareStatement(insert);
+                    pst = connection.prepareStatement(q2);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -160,6 +168,7 @@ public class DBHandler extends Configs {
                     pst.setString(7, (String) list.get(6));
                     pst.setString(8, (String) list.get(7));
                     pst.setString(9, (String) list.get(8));
+                    pst.setInt(10, a);
 
                     pst.executeUpdate();
 
@@ -190,17 +199,16 @@ public class DBHandler extends Configs {
                 //формируем запросы к БД
                 count = 1;
                 int id = 0;
-                insert = "INSERT INTO /**noise.**/orders(customer_login, order_date, amount, seller_name)"
+                q2 = "INSERT INTO /**noise.**/orders(customer_login, order_date, amount, seller_name)"
                         + "VALUES (?,?,?,?)";
-
 
                 //загружаем order в БД
                 try {
                     //записываем данные и получаем ID созданной строки
-                    pst = connection.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS);
+                    pst = connection.prepareStatement(q2, Statement.RETURN_GENERATED_KEYS);
 
                     pst.setString(1, customer.getLogin());
-                    pst.setDate(2,  new java.sql.Date(new java.util.Date().getTime()));
+                    pst.setDate(2,  new Date(new java.util.Date().getTime()));
                     pst.setDouble(3, seller.getCost());
                     pst.setString(4, seller.getSeller());
 
@@ -214,10 +222,10 @@ public class DBHandler extends Configs {
 
                     //записываем материалы относящиеся к только созданному заказу
                     for (MaterialTable i: listProduct) {
-                        insert = "INSERT INTO /**noise.**/items_order(orders_id, name, area, depth, count)"
+                        q2 = "INSERT INTO /**noise.**/items_order(orders_id, name, area, depth, count)"
                                 + "VALUES (?,?,?,?,?)";
 
-                        pst = connection.prepareStatement(insert);
+                        pst = connection.prepareStatement(q2);
 
                         pst.setInt(1, id);
                         pst.setString(2, i.getNameMat());
@@ -254,12 +262,13 @@ public class DBHandler extends Configs {
     public MyRequest Read(MyRequest r) {
 
         //создаем соединение
-        DBHandler handler = DBHandler.getInstance();
-        Connection connection = handler.getConnection();
+        handler = DBHandler.getInstance();
+        connection = handler.getConnection();
 
         ArrayList list;
         ArrayList listAnswer;
-        int count;
+        String login;
+        String password;
 
         //проверяем тип обьекта
         switch (r.getRequestTypeB()){
@@ -329,7 +338,7 @@ public class DBHandler extends Configs {
                 list = (ArrayList) r.getData();
                 login = (String) list.get(0);
 
-                ArrayList list2 = new ArrayList<>();
+                listAnswer = new ArrayList<>();
 
                 //формируем запросы к БД
                 q1 = "SELECT * from product where owner=?";
@@ -343,14 +352,14 @@ public class DBHandler extends Configs {
                     //в цикле достаем из ответа строки и записываем их в коллекцию в виде обьектов SellerMaterialTable
                     while (rs.next()) {
 
-                        list2.add( new SellerMaterialTable(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4),
+                        listAnswer.add( new SellerMaterialTable(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4),
                                 rs.getString(5), Double.parseDouble(rs.getString(6)), Double.parseDouble(rs.getString(7)),
                                 rs.getString(8), Double.parseDouble(rs.getString(9))));
 
                     }
 
                     //записываем ответ
-                    request = new MyRequest(MyRequest.RequestType.ANSWER, MyRequest.RequestTypeB.LIST_MY_PRODUCT, list2);
+                    request = new MyRequest(MyRequest.RequestType.ANSWER, MyRequest.RequestTypeB.LIST_MY_PRODUCT, listAnswer);
 
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -374,13 +383,12 @@ public class DBHandler extends Configs {
                 String grade = (String) list.get(1);
 
                 //коллекци для записи ответа
-                ArrayList<SellerTable> listSellerFromCity = new ArrayList<>();
-                ArrayList<MaterialTable> listChoiseProduct = null;
+                listAnswer = new ArrayList<SellerTable>();
+                ArrayList<MaterialTable> listChoiseProduct;
 
                 //формируем запросы к БД
                 q1 = "SELECT * from sellers where city=?";
                 q2 = "SELECT * from product where idsellers=?";
-
 
                 try {
                     pst = (com.mysql.jdbc.PreparedStatement) connection.prepareStatement(q1);
@@ -430,23 +438,20 @@ public class DBHandler extends Configs {
                                     cloneListB.get(i).setNameMat("delete");
 
                                 }
-
                             }
 
                             //увеличиваем стоимость на сумму каждой подобранной позиции
                             value += cost;
-
                         }
 
                         //заполняем данными SellerTable
                         //клонируем коллекцию с подобранными материалами и обнуляем ее для дальнейшей работы
-                        listSellerFromCity.add( new SellerTable(rs.getString(2), rs.getString(6), value,
+                        listAnswer.add( new SellerTable(rs.getString(2), rs.getString(6), value,
                                 rs.getString(4), listChoiseProduct));
-
                     }
 
                     //записываем ответ
-                    request = new MyRequest(MyRequest.RequestType.ANSWER, MyRequest.RequestTypeB.LIST_FIND_SELLER, listSellerFromCity);
+                    request = new MyRequest(MyRequest.RequestType.ANSWER, MyRequest.RequestTypeB.LIST_FIND_SELLER, listAnswer);
 
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -571,11 +576,8 @@ public class DBHandler extends Configs {
     public MyRequest Update(MyRequest r){
 
         //создаем соединение
-        DBHandler handler = DBHandler.getInstance();
-        Connection connection = handler.getConnection();
-        int count;
-        String q1;
-        String update;
+        handler = DBHandler.getInstance();
+        connection = handler.getConnection();
 
         //проверяем тип обьекта
         switch (r.getRequestTypeB()) {
@@ -587,11 +589,11 @@ public class DBHandler extends Configs {
 
                 //формируем запросы к БД
                 count = 1;
-                update = "UPDATE orders SET processed = 'yes' WHERE idorders = ?;";
+                q1 = "UPDATE orders SET processed = 'yes' WHERE idorders = ?;";
 
                 //загружаем product в БД
                 try {
-                    pst = connection.prepareStatement(update);
+                    pst = connection.prepareStatement(q1);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -618,7 +620,6 @@ public class DBHandler extends Configs {
 
                 break;
 
-
         }
         return request;
     }
@@ -627,9 +628,6 @@ public class DBHandler extends Configs {
         //создаем соединение
         DBHandler handler = DBHandler.getInstance();
         Connection connection = handler.getConnection();
-        int count;
-        String q1;
-        String delete;
 
         //проверяем тип обьекта
         switch (r.getRequestTypeB()) {
@@ -641,11 +639,11 @@ public class DBHandler extends Configs {
 
                 //формируем запросы к БД
                 count = 1;
-                delete = "DELETE FROM orders WHERE idorders = ?;";
+                q1 = "DELETE FROM orders WHERE idorders = ?;";
 
                 //загружаем product в БД
                 try {
-                    pst = connection.prepareStatement(delete);
+                    pst = connection.prepareStatement(q1);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -679,11 +677,11 @@ public class DBHandler extends Configs {
 
                 //формируем запросы к БД
                 count = 1;
-                delete = "DELETE FROM product WHERE idproduct = ? ;";
+                q1 = "DELETE FROM product WHERE idproduct = ? ;";
 
                 //загружаем product в БД
                 try {
-                    pst = connection.prepareStatement(delete);
+                    pst = connection.prepareStatement(q1);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -713,5 +711,4 @@ public class DBHandler extends Configs {
         }
         return request;
     }
-
 }
